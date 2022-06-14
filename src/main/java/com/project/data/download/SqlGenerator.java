@@ -1,10 +1,14 @@
 package com.project.data.download;
 
 import com.project.data.Coin;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SqlGenerator {
+
+    @Value("${create.database.name}")
+    private String nameOfDatabase;
 
     public String getCreateDatabaseSql(String nameOfDatabase) {
         String sql = "CREATE SCHEMA `" + nameOfDatabase + "`;";
@@ -13,8 +17,9 @@ public class SqlGenerator {
     }
     
     public String getCreateTableSql(String nameOfTable) {
-        String sql = "CREATE TABLE `my_db`." +
-                "`" + 
+        String sql = "CREATE TABLE `" +
+                nameOfDatabase +
+                "`.`" +
                 nameOfTable +
                 "`" +
                 " (\n" +
@@ -41,7 +46,9 @@ public class SqlGenerator {
                 "\"" +
                 pathToFile +
                 "\"" +
-                " INTO TABLE my_db." +
+                " INTO TABLE " +
+                nameOfDatabase +
+                "." +
                 nameOfFile +
                 " FIELDS TERMINATED BY ',' (openTime, openKline, hightPrice, \n" +
                 "lowPrice, closeKline, volume, closeTime, quoteAssetVolume, numberOfTrades, \n" +
@@ -57,21 +64,42 @@ public class SqlGenerator {
                 "    FROM \n" +
                 "    information_schema.TABLES \n" +
                 "    WHERE \n" +
-                "    TABLE_SCHEMA LIKE 'my_db' AND \n" +
+                "    TABLE_SCHEMA LIKE '" +
+                nameOfDatabase
+                + "' AND \n" +
                 "        TABLE_TYPE LIKE 'BASE TABLE' AND\n" +
-                "        TABLE_NAME = '" + nameOfTable + "'\n" + "    );";
+                "        TABLE_NAME = '" +
+                nameOfTable
+                + "'\n" + "    );";
+
+        return sql;
+    }
+
+    public String getIsDatabaseExistSql(String nameOfDatabase) {
+        String sql = "SELECT EXISTS(\n" +
+                "SELECT SCHEMA_NAME\n" +
+                "  FROM INFORMATION_SCHEMA.SCHEMATA\n" +
+                " WHERE SCHEMA_NAME = '" +
+                nameOfDatabase +
+                "');";
 
         return sql;
     }
 
     public String getDataTableSql(String nameOfTable) {
-        String sql = "SELECT * FROM my_db." + nameOfTable + ";";
+        String sql = "SELECT * FROM " +
+                nameOfDatabase +
+                "." +
+                nameOfTable + ";";
 
         return sql;
     }
 
     public String getLastRowSql(String nameOfTable) {
-        String sql = "SELECT * FROM my_db." + nameOfTable + " ORDER BY id DESC LIMIT 1;";
+        String sql = "SELECT * FROM " +
+                nameOfDatabase +
+                "." +
+                nameOfTable + " ORDER BY id DESC LIMIT 1;";
 
         return sql;
     }

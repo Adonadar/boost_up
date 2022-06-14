@@ -6,7 +6,8 @@ import org.springframework.context.annotation.*;
 @EnableAspectJAutoProxy
 @ComponentScan("com")
 @PropertySources({
-        @PropertySource("jdbc_connection.properties"),
+        @PropertySource("jdbcConnection.properties"),
+        @PropertySource("general.cfg.properties"),
         @PropertySource("url.properties")   }   )
 public class SpringConfig {
 }

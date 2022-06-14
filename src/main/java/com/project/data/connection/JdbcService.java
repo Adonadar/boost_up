@@ -67,6 +67,42 @@ public class JdbcService {
         return false;
     }
 
+    public boolean isDatabaseExist(String nameOfDatabase) {
+        String sql = sqlGenerator.getIsDatabaseExistSql(nameOfDatabase);
+        List<String> stringList = new ArrayList<>();
+        int result;
+
+        try {
+            connection = jdbcConnection.getConnection();
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+
+            int id = resultSet.getMetaData().getColumnCount();
+
+            while(resultSet.next()) {
+                for(int i = 1; i <= id; i++) {
+                    stringList.add(String.valueOf(resultSet.getString(i)));
+                }
+            }
+
+            result = Integer.valueOf(stringList.get(0));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                statement.close();
+                connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        if(result == 1) {
+            return true;
+        }
+        return false;
+    }
+
     public List<Coin> getTable(String nameOfTable) {
         String sql = sqlGenerator.getDataTableSql(nameOfTable);
         Coin coin;
