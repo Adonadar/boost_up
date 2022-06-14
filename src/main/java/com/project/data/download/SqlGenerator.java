@@ -1,14 +1,11 @@
 package com.project.data.download;
 
 import com.project.data.Coin;
-import org.springframework.beans.factory.annotation.Value;
+import com.project.data.constant.Constant;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SqlGenerator {
-
-    @Value("${create.database.name}")
-    private String nameOfDatabase;
 
     public String getCreateDatabaseSql(String nameOfDatabase) {
         String sql = "CREATE SCHEMA `" + nameOfDatabase + "`;";
@@ -18,7 +15,7 @@ public class SqlGenerator {
     
     public String getCreateTableSql(String nameOfTable) {
         String sql = "CREATE TABLE `" +
-                nameOfDatabase +
+                Constant.NAME_OF_DATABASE +
                 "`.`" +
                 nameOfTable +
                 "`" +
@@ -47,7 +44,7 @@ public class SqlGenerator {
                 pathToFile +
                 "\"" +
                 " INTO TABLE " +
-                nameOfDatabase +
+                Constant.NAME_OF_DATABASE +
                 "." +
                 nameOfFile +
                 " FIELDS TERMINATED BY ',' (openTime, openKline, hightPrice, \n" +
@@ -65,7 +62,7 @@ public class SqlGenerator {
                 "    information_schema.TABLES \n" +
                 "    WHERE \n" +
                 "    TABLE_SCHEMA LIKE '" +
-                nameOfDatabase
+                Constant.NAME_OF_DATABASE
                 + "' AND \n" +
                 "        TABLE_TYPE LIKE 'BASE TABLE' AND\n" +
                 "        TABLE_NAME = '" +
@@ -88,7 +85,7 @@ public class SqlGenerator {
 
     public String getDataTableSql(String nameOfTable) {
         String sql = "SELECT * FROM " +
-                nameOfDatabase +
+                Constant.NAME_OF_DATABASE +
                 "." +
                 nameOfTable + ";";
 
@@ -97,7 +94,7 @@ public class SqlGenerator {
 
     public String getLastRowSql(String nameOfTable) {
         String sql = "SELECT * FROM " +
-                nameOfDatabase +
+                Constant.NAME_OF_DATABASE +
                 "." +
                 nameOfTable + " ORDER BY id DESC LIMIT 1;";
 

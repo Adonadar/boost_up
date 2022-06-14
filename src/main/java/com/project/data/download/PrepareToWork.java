@@ -1,15 +1,12 @@
 package com.project.data.download;
 
 import com.project.data.connection.JdbcService;
+import com.project.data.constant.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PrepareToWork {
-    @Value("${create.database.name}")
-    private String nameOfDatabase;
-
     private JdbcService jdbcService;
 
     @Autowired
@@ -18,8 +15,8 @@ public class PrepareToWork {
     }
 
     public void makePreparation() {
-        if(!jdbcService.isDatabaseExist(nameOfDatabase)) {
-            jdbcService.createDatabase(nameOfDatabase);
+        if(!jdbcService.isDatabaseExist(Constant.NAME_OF_DATABASE)) {
+            jdbcService.createDatabase(Constant.NAME_OF_DATABASE);
         } else {
             System.out.println("Такая бд уже есть");
         }
