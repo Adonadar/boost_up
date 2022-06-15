@@ -1,5 +1,6 @@
 package com.project.test;
 
+import com.project.service.ServicePreparation;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import com.project.data.hibernate.ActionPairNameDatabase;
 import com.project.data.download.DataLoader;
@@ -9,9 +10,12 @@ public class MainStart {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SpringConfig.class);
         DataLoader dataLoader = context.getBean("dataLoader", DataLoader.class);
+        ServicePreparation preparation = context.getBean("servicePreparation", ServicePreparation.class);
         ActionPairNameDatabase actionPairNameDatabase = context.getBean("actionPairNameDatabase", ActionPairNameDatabase.class);
 
-        actionPairNameDatabase.addAsset("BNBUSDT", "1m");
+        preparation.start();
+
+        actionPairNameDatabase.addAsset("BTCUSDT", "1m");
 
         dataLoader.download();
 

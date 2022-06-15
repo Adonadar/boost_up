@@ -1,6 +1,6 @@
 package com.project.data.download;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.project.constant.Constant;
 import org.springframework.stereotype.Component;
 
 import java.net.MalformedURLException;
@@ -9,32 +9,79 @@ import java.net.URL;
 @Component
 public class UrlGenerator {
 
-    private String url = "https://data.binance.vision/data/spot/monthly/klines/";
+    private String url;
 
-    private String pathToSaveFile = "C:\\test\\";
-
-    private String pathToDemoFile = "c:/test/";
-
-    public String getPathToDemoFile() {
-        return pathToDemoFile;
-    }
-
-    @Value("${url.fileFormat}")
-    private String fileFormat;
-
-    public String getPathToSaveFile() {
-        return pathToSaveFile;
-    }
+    private String pathToDirectory;
 
     private String pareOfAsset;
 
     private String period;
 
-    @Value("${url.startDateYear}")
     private int dateYear;
 
-    @Value("${url.startDateMonth}")
     private int dateMonth;
+
+    public URL getConnection() {
+        try {
+            return new URL(
+                (url +
+                pareOfAsset + "/" +
+                period + "/" +
+                pareOfAsset + "-" +
+                period + "-" +
+                dateYear + "-" +
+                getMonthLikeString() +
+                ".zip"));
+
+        } catch (MalformedURLException e) {
+            System.out.println("ошибка создания url");
+            e.toString();
+            return null;
+        }
+    }
+
+    private String getMonthLikeString() {
+        String dateMonthString;
+
+        if(getDateMonth()<10) {
+            dateMonthString = "0" + getDateMonth();
+        } else {
+            dateMonthString = String.valueOf(getDateMonth());
+        }
+
+        return dateMonthString;
+    }
+
+    public String getNameToFile(String format) {
+        String path;
+        path = pareOfAsset + "-" +
+                period + "-" +
+                dateYear + "-" +
+                getMonthLikeString();
+
+        switch (format) {
+            case "zip" :
+                path = path + ".zip";
+                break;
+            case "csv" :
+                path = path + ".csv";
+                break;
+            default: System.out.println("illegal format");
+        }
+
+        return path;
+    }
+
+    public UrlGenerator() {
+        url = Constant.URL_TO_BINANCE_DATA;
+        pathToDirectory = Constant.PATH_TO_DIRECTORY;
+        dateYear = Constant.DATE_YEAR;
+        dateMonth = Constant.DATE_MONTH;
+    }
+
+    public String getPathToDirectory() {
+        return pathToDirectory;
+    }
 
     public int getDateYear() {
         return dateYear;
@@ -70,63 +117,5 @@ public class UrlGenerator {
 
     public String getUrl() {
         return url;
-    }
-
-    public String getFileFormat() {
-        return fileFormat;
-    }
-
-    public URL getConnection() {
-        try {
-            return new URL(
-                (url +
-                pareOfAsset + "/" +
-                period + "/" +
-                pareOfAsset + "-" +
-                period + "-" +
-                dateYear + "-" +
-                getMonthString() +
-                fileFormat));
-
-        } catch (MalformedURLException e) {
-            System.out.println("ошибка создания url");
-            e.toString();
-            return null;
-        }
-    }
-
-    public String getMonthString() {
-        String dateMonthString;
-
-        if(getDateMonth()<10) {
-            dateMonthString = "0" + getDateMonth();
-        } else {
-            dateMonthString = String.valueOf(getDateMonth());
-        }
-
-        return dateMonthString;
-    }
-
-    public String getNameForSaveFileZip() {
-        String path = pareOfAsset + "-" +
-        period + "-" +
-        dateYear + "-" +
-        getMonthString() +
-        fileFormat;
-
-        return path;
-    }
-
-    public String getNameForSaveFileCsv() {
-        String path = pareOfAsset + "-" +
-        period + "-" +
-        dateYear + "-" +
-        getMonthString() +
-        ".csv";
-        return path;
-    }
-
-    public String getToLoadFile() {
-        return "\"" + getPathToSaveFile() + getNameForSaveFileCsv() + "\"";
     }
 }

@@ -1,7 +1,7 @@
 package com.project.data.download;
 
 import com.project.data.Coin;
-import com.project.data.constant.Constant;
+import com.project.constant.Constant;
 import org.springframework.stereotype.Component;
 
 @Component

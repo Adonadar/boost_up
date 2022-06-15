@@ -1,7 +1,8 @@
 package com.project.data.download;
 
+import com.project.constant.Constant;
+import com.project.service.ServicePreparation;
 import com.project.service.ServiceLinkValidityVerify;
-import com.project.service.ServiceInternetConnectionCheck;
 import com.project.data.connection.JdbcService;
 import com.project.data.hibernate.ActionPairNameDatabase;
 import net.lingala.zip4j.ZipFile;
@@ -22,8 +23,6 @@ public class DataLoader {
 
     private Calendar calendar;
 
-    private ServiceInternetConnectionCheck internetConnectionCheck;
-
     private UrlGenerator urlGenerator;
 
     private ActionPairNameDatabase actionPairNameDatabase;
@@ -34,11 +33,7 @@ public class DataLoader {
 
     private UpdateData updateData;
 
-//    @Value("${url.startDateYear}")
-    private int dateYear = 2021;
-
-//    @Value("${url.startDateMonth}")
-    private int dateMonth = 1;
+    private ServicePreparation prepareToWork;
 
     @Autowired
     public void setLinkValidityVerify(ServiceLinkValidityVerify linkValidityVerify) {
@@ -61,20 +56,16 @@ public class DataLoader {
     }
 
     @Autowired
-    public void setInternetConnectionCheck(ServiceInternetConnectionCheck internetConnectionCheck) {
-        this.internetConnectionCheck = internetConnectionCheck;
-    }
-
-    @Autowired
     public void setUpdateData(UpdateData updateData) {
         this.updateData = updateData;
     }
 
-    public void download() {
-        if(!internetConnectionCheck.check()) {
-            return;
-        }
+    @Autowired
+    public void setPrepareToWork(ServicePreparation prepareToWork) {
+        this.prepareToWork = prepareToWork;
+    }
 
+    public void download() {
         List<GeneralTable> generalTableList = actionPairNameDatabase.getAllAsset();
 
         calendar = Calendar.getInstance();
@@ -91,7 +82,7 @@ public class DataLoader {
             urlGenerator.setPareOfAsset(asset);
             urlGenerator.setPeriod(period);
 
-            jdbcService.createTable(generalTable.getNameOfTable());
+            jdbcService.createTable(nameOfTable);
 
             for (int year = urlGenerator.getDateYear(); year <= calendar.get(Calendar.YEAR); year++) {
                 for (int month = urlGenerator.getDateMonth(); month <= 12; month++) {
@@ -117,7 +108,7 @@ public class DataLoader {
                     try {
                         FileUtils.copyURLToFile(
                                 urlGenerator.getConnection(),
-                                new File(urlGenerator.getPathToSaveFile() + urlGenerator.getNameForSaveFileZip()), 10000, 10000);
+                                new File(urlGenerator.getPathToDirectory() + urlGenerator.getNameToFile("zip")), 10000, 10000);
                     } catch (IOException e) {
                         System.out.println(e.getMessage());
                     }
@@ -125,23 +116,24 @@ public class DataLoader {
                     System.out.println("[Файл сохранен]");
 
                     try {
-                        new ZipFile(urlGenerator.getPathToSaveFile() + urlGenerator.getNameForSaveFileZip())
-                                .extractAll(urlGenerator.getPathToSaveFile());
+                        new ZipFile(urlGenerator.getPathToDirectory() + urlGenerator.getNameToFile("zip"))
+                                .extractAll(urlGenerator.getPathToDirectory());
                     } catch (ZipException e) {
                         throw new RuntimeException(e);
                     }
 
                     System.out.println("[Файл разархивирован]");
 
-                    jdbcService.loadData(nameOfTable, (urlGenerator.getPathToDemoFile() + urlGenerator.getNameForSaveFileCsv()));
+                    jdbcService.loadData(nameOfTable, (urlGenerator.getPathToDirectory() + urlGenerator.getNameToFile("csv")));
 
                     System.out.println("[Выгрузка данных в базу данных успешна]");
 
                     if (isDeleteFile) {
-                        FileUtils.deleteQuietly(new File(urlGenerator.getPathToSaveFile() +
-                                urlGenerator.getNameForSaveFileZip()));
-                        FileUtils.deleteQuietly(new File(urlGenerator.getPathToSaveFile() +
-                                urlGenerator.getNameForSaveFileCsv()));
+                        try {
+                            FileUtils.cleanDirectory(new File(Constant.PATH_TO_DIRECTORY));
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
 
                     System.out.println("[Удаление файлов]");
@@ -154,8 +146,8 @@ public class DataLoader {
                 urlGenerator.setDateYear(urlGenerator.getDateYear() + 1);
             }
 //            updateData.update(generalTable.getNameOfTable());
-            urlGenerator.setDateMonth(dateMonth);
-            urlGenerator.setDateYear(dateYear);
+            urlGenerator.setDateMonth(Constant.DATE_MONTH);
+            urlGenerator.setDateYear(Constant.DATE_YEAR);
         }
     }
 }
