@@ -19,7 +19,7 @@ import java.util.List;
 
 @Component
 public class DataLoader {
-    private boolean isDeleteFile = true;
+    private boolean isDeleteFile = false;
 
     private Calendar calendar;
 
@@ -32,8 +32,6 @@ public class DataLoader {
     private JdbcService jdbcService;
 
     private UpdateData updateData;
-
-    private ServicePreparation prepareToWork;
 
     @Autowired
     public void setLinkValidityVerify(ServiceLinkValidityVerify linkValidityVerify) {
@@ -60,11 +58,6 @@ public class DataLoader {
         this.updateData = updateData;
     }
 
-    @Autowired
-    public void setPrepareToWork(ServicePreparation prepareToWork) {
-        this.prepareToWork = prepareToWork;
-    }
-
     public void download() {
         List<GeneralTable> generalTableList = actionPairNameDatabase.getAllAsset();
 
@@ -86,6 +79,7 @@ public class DataLoader {
 
             for (int year = urlGenerator.getDateYear(); year <= calendar.get(Calendar.YEAR); year++) {
                 for (int month = urlGenerator.getDateMonth(); month <= 12; month++) {
+
                     if(urlGenerator.getDateYear() == calendar.get(Calendar.YEAR)
                             && urlGenerator.getDateMonth() == calendar.get(Calendar.MONTH) + 1) {
                         break;
@@ -145,7 +139,7 @@ public class DataLoader {
                 urlGenerator.setDateMonth(1);
                 urlGenerator.setDateYear(urlGenerator.getDateYear() + 1);
             }
-//            updateData.update(generalTable.getNameOfTable());
+            updateData.update(asset, nameOfTable);
             urlGenerator.setDateMonth(Constant.DATE_MONTH);
             urlGenerator.setDateYear(Constant.DATE_YEAR);
         }

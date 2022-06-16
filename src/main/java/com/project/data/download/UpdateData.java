@@ -40,14 +40,14 @@ public class UpdateData {
         this.reformatFromKlineToCoin = reformatFromKlineToCoin;
     }
 
-    public void update(String nameOfTable ) {
+    public void update(String pairOfAsset, String nameOfTable) {
         binanceApi = binanceApiGetter.getBinanceApi();
         Coin coin;
         BinanceSymbol symbol = null;
         boolean isNext = true;
 
         try {
-            symbol = new BinanceSymbol("BNBUSDT");
+            symbol = new BinanceSymbol(pairOfAsset);
         } catch (BinanceApiException e) {
             System.out.println("Ошибка при создании BinanceSymbol");
         }
@@ -90,6 +90,7 @@ public class UpdateData {
             }
 
             System.out.println("Дозагружено строк: " + klines.size());
+            System.out.println(time - endTime);
         }
     }
 }

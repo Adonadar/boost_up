@@ -15,7 +15,7 @@ public class MainStart {
 
         preparation.start();
 
-        actionPairNameDatabase.addAsset("BTCUSDT", "1m");
+        actionPairNameDatabase.addAsset("BNBUSDT", "1m");
 
         dataLoader.download();
 
